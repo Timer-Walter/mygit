@@ -1,0 +1,122 @@
+
+git配置设置：
+$ git config --global user.name "Your Name"
+$ git config --global user.email "email@example.com"
+
+为当前目录添加Git仓库（git初始化）：
+$ git init
+$ ls -ah (查看.git目录)
+
+将文件添加到仓库：
+$ git add readme.txt
+把文件提交到仓库：
+$ git commit -m "wrote a readme file"
+
+查看仓库当前状态：
+$ git status
+
+查看文件修改内容：
+$ git diff readme.txt 
+
+显示提交日志：
+$ git log
+$ git log --pretty=oneline （简化输出）
+
+回退到上一版本：
+$ git reset --hard HEAD^
+
+回退到某一版本：
+$ git reset --hard 3628164（版本id号）
+
+显示所有命令日志：
+$ git reflog
+
+查看工作区和版本库里面最新版本的区别：
+$ git diff HEAD -- readme.txt 
+
+撤销工作区文件的修改：
+$ git checkout -- readme.txt
+
+撤销暂缓区文件的修改：
+$ git reset HEAD readme.txt
+
+删除版本库中的文件：
+$ git rm test.txt
+$ git commit -m "remove test.txt"（需提交）
+
+还原文件区误删的文件：
+$ git checkout -- test.txt（恢复到最新版本）
+
+创建SSH Key：
+$ ssh-keygen -t rsa -C "youremail@example.com"
+
+将远程仓库与本地仓库关联：
+$ git remote add origin git@github.com:michaelliao/learngit.git （远程仓库为github）
+
+将本地仓库的内容推送到github仓库：
+$ git push （-u） origin master （-u用于第一次推送）
+
+查看分支：
+$ git branch
+创建分支：
+$ git branch dev (dev为分支名)
+切换分支：
+$ git checkout dev/master (master为主分支)
+合并某分支到当前分支：
+$ git merge dev
+删除分支：
+$ git branch -d dev
+创建并切换到分支：
+$ git checkout -b dev
+查看分支合并情况：
+$ git log --graph --pretty=oneline --abbrev-commit
+分支合并时禁止fast forward（保留分支信息）：
+$ git merge --no-ff -m "merge with no-ff" dev
+
+储藏当前工作现场：（可多次stash）
+$ git stash
+恢复工作现场：
+$ git stash pop
+查看stash情况：
+$ git stash list
+恢复指定的stash：
+$ git stash apply stash@{0}
+
+强行删除分支：
+$ git branch -D dev
+
+查看远程库信息：
+$ git remote
+$ git remote -v
+
+推送分支：
+$ git push origin dev
+
+创建远程origin的dev分支到本地：
+$ git checkout -b dev origin/dev
+
+把远程的提交抓取到本地：
+$ git pull
+设置dev和origin/dev的链接：
+$ git branch --set-upstream dev origin/dev
+
+给当前最新提交版本打标签：
+$ git tag v1.0
+查看所有标签：
+$ git tag
+给指定提交打标签：
+$ git tag v0.9 6224937
+创建带有说明的标签：
+$ git tag -a v0.1 -m "version 0.1 released" 3628164（-a指定标签名，-m指定说明文字）
+删除标签：
+$ git tag -d v0.1
+推送某个标签到远程：
+$ git push origin v1.0
+一次性推送全部尚未推送到远程的本地标签：
+$ git push origin --tags
+删除远程标签：
+$ git push origin :refs/tags/v0.9
+
+
+
+
