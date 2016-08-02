@@ -1,0 +1,71 @@
+局域网（路由器）环境下的linux集群搭建实验（mpich3版）
+1、	在各节点电脑上安装VMware虚拟机平台
+2、	在各节点的Vmware中构建Linux虚拟机（red hat-workstation-6.4的64位操作系统，需安装软件工作站版，桌面版没有安装gcc编译，无法部署mpich）PS：也可直接复制虚拟机
+3、	构建虚拟机中，网络设置采用桥接模式，共两台电脑，各有一个Linux虚拟机为node1和node2
+4、	在系统网络设置中选择自动连接，在终端用ip address指令查看ip地址，node1的ip：192.168.0.100； node2的ip：192.168.0.102（在局域网中是动态分配的）
+5、	更改主机名为：node1和node2
+vi  /etc/sysconfig/network
+HOSTNAME=node1
+node2操作和node1相同
+例如：
+[root@node1 ~]# cat /etc/sysconfig/network
+NETWORKING=yes
+HOSTNAME=node1
+6、	关闭各个节点防火墙：#service iptables stop （临时关闭，重启后失效）
+7、	创建SSH信任连接（在root目录下，cd下就可以了）：
+（1）	更改/etc/hosts 文件
+#vi /etc/hosts   打开hosts文件，更改如下：
+127.0.0.1 localhost.localdomain localhost
+192.168.0.100   node1 （添加的）
+192.168.0.102   node2 （添加的）
+（2） 在node1上生成SSH密钥对
+      #ssh-keygen -t rsa 回车即可,产生.ssh文件
+      确保每个节点均已生成.ssh文件后：
+#scp /root/.ssh/id_rsa.pub node2:/root /.ssh/authorized_keys
+对node2（所有节点）执行一样的操作
+ （3） 确认两台机器的信任已建立：对每个节点执行：
+#ssh node1
+#ssh node2
+在提示处输入yes回车，最后确定无需输入密码并且没有任何提示信息即可登陆（"Last login:时间日期"提示信息除外）
+8、安装MPICH3（在节点root目录下）
+   #tar -zxvf mpich-3.2.tar.gz
+   #mkdir /usr/MPICH-install （创建安装目录）
+   #cd mpich-3.2
+   #./configure --prefix=/usr/MPICH-install (设置安装目录)
+   #make（编译）
+   #make install （安装）
+   cd回到root目录：
+   #vi .bashrc  通过编辑.bashrc文件修改环境变量
+   修改后的.bashrc文件如下：
+　　# .bashrc
+　　# User specific aliases and functions
+PATH=$PATH:/usr/MPICH-install/bin   新增加的
+#source .bashrc
+9、测试：#which mpiexec（mpich3中用此命令启动运行环境）与mpich2不同，没有mpd命令
+10、添加machinefile文件（root目录下）：
+#vi machinefile（也可命名为其他）
+内容为：
+node1
+node2
+11、运行测试程序：
+#scp /home/node1/桌面/mpich-3.2/examples/cpi /home/cpi（将测试程序拷到指定处）
+# mpiexec -n 6 -machinefile ~/machinefile  / home /cpi
+通过运行该命令测试是否正确安装mpich3。注意一点可执行程序cpi在不同节点上的位置要一样，就是绝对路径要一样，否则会报错
+上述命令的结果是：
+Process 2 of 6 is on node1
+Process 5 of 6 is on node1
+Process 0 of 6 is on node2
+Process 3 of 6 is on node2
+Process 1 of 6 is on node3
+Process 4 of 6 is on node3
+pi is approximately 3.1415926544231243, Error is 0.0000000008333312
+wall clock time = 0.001908
+       更多的命令参数可参看官网文档：http://www.mpich.org/static/downloads/3.0.4/mpich-3.0.4-userguide.pdf。
+       按照上述步骤绝大多数情况下可以正确安装mpich3，有一点需要注意，在所有的服务器上运行的mpi版本必须一致，否则也会出错。有时有些问题是由于防火墙导致的，在运行mpi程序时，我们可以关掉防火墙：
+?	关闭防火墙
+                    #service iptables stop
+?	查看防火墙状态
+                  #service iptables status
+
+
+
